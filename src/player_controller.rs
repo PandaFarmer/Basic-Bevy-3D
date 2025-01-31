@@ -47,22 +47,34 @@ struct AccumulatedInput(Vec3);
 //     }
 // }
 
+
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,) {
     let body = meshes.add(Cuboid::new(3.0, 3.0, 3.0));
     let body_material = materials.add(Color::from(tailwind::TEAL_200));
+    // let gltf_handle = asset_server.load("models/your_model.glb");
     commands.spawn((
-        Mesh3d(body),
-        MeshMaterial3d(body_material),
-        Transform::from_xyz(0.2, -0.1, -0.25),
+        
+        // Mesh3d(body),
+        // MeshMaterial3d(body_material),
+        Transform::default().looking_at(Vec3::Z.lerp(Vec3::X, 0.5), Vec3::Y),//lerp between cause diagonal camera starting angle
+        // Transform::from_xyz(0.2, -0.1, -0.25).with_scale(Vec3::new(0.5, 0.5, 1.0)),
         Player,
         Velocity::default(),
         AccumulatedInput::default(),
         // Ensure the arm is only rendered by the view model camera.
         // RenderLayers::layer(VIEW_MODEL_RENDER_LAYER),
         // The arm is free-floating, so shadows would look weird.
-        NotShadowCaster,
-    ));
+        // NotShadowCaster,
+    ))
+    .with_children(|parent| {
+        parent.spawn((SceneRoot(asset_server.load(
+            GltfAssetLabel::Scene(0).from_asset("models/ElephantAlien.glb"),
+            )),
+            Transform::default().looking_at(Vec3::X, Vec3::Y),
+        ));
+        
+    });
 }
 
 /// This system prints 'A' key state
@@ -135,7 +147,6 @@ fn apply_velocity(mut query: Query<(&mut Transform, &mut Velocity, &Player)>,
     let base_lookforward = Vec2::new(0.0, 1.0);
     for (mut transform, mut velocity, player) in query.iter_mut() {
         
-        transform.scale = Vec3::new(0.5, 0.5, 1.0);//lazy, should do on setup only
         if(velocity.0.length() > 0.0)
         {
             info!("Velocity: {}", velocity.0);

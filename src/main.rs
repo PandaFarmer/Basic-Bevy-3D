@@ -1,10 +1,11 @@
 use bevy::prelude::*;
 
+mod load_gltf;
 
-mod first_person_view_model;
 mod camera_orbit;
 mod movement;
 mod player_controller;
+// mod mesh_deformation;
 
 #[derive(Component)]
 struct Person;
@@ -77,10 +78,16 @@ fn main() {
     // .add_systems(Update, (fpvm::move_player, fpvm::move_camera, fpvm::change_fov))
     // .run();
 
+    // App::new()
+    //     .add_plugins(DefaultPlugins)
+    //     .add_plugins(load_gltf::LoadGltfPlugin)
+    //     .run();
+
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(player_controller::PlayerControllerPlugin)
         .add_plugins(camera_orbit::CameraOrbitPlugin)
+        // .add_plugins(mesh_deformation::MeshDeformationPlugin)
         .run();
 
 }
